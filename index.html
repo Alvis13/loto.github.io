@@ -26,12 +26,36 @@
             overflow-x: hidden;
         }
 
-        h2 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 24px;
-        }
+        /* ---------------------------------------------------
+           THANH LỊCH SỬ CHẠY NGANG (TICKER LED)
+           --------------------------------------------------- */
+/* --- CSS: ĐẢM BẢO CHỮ CHẠY MƯỢT MÀ KHÔNG GIẬT --- */
+.ticker-wrap {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 15px auto;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0px 0;
+	height: 13px;      /* Cố định chiều cao khung là 25px */
+    line-height: 5px; /* Giúp chữ căn giữa theo chiều dọc của khung */
+    border-radius: 6px;
+    overflow: hidden; 
+    border: 1px solid #34495e;
+}
+.ticker-text {
+    display: inline-block;
+    white-space: nowrap;
+    animation: ticker 30s linear infinite; 
+    font-size: 7px;
+    font-weight: bold;
+    color: #2ecc71;
+    text-transform: uppercase;
+}
+
+@keyframes ticker {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
 
         .tabs-container {
             width: 100%;
@@ -105,9 +129,6 @@
             height: 20px; 
         }
 
-        /* ---------------------------------------------------
-           CONTAINER CHỨA BÀI & NÚT RESET OVERLAY
-           --------------------------------------------------- */
         .board-container {
             position: relative; 
             width: 100%;
@@ -126,9 +147,8 @@
             transition: filter 0.6s ease; 
         }
 
-        /* Class thêm vào khi game kết thúc */
         .board.dimmed {
-            filter: blur(1px) brightness(0.4);
+            filter: blur(2px) brightness(0.4);
             pointer-events: none; 
         }
 
@@ -137,37 +157,36 @@
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
 
-button.reset-btn {
+        /* Nút Chơi Tiếp Trong Suốt */
+        button.reset-btn {
             position: absolute; 
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 100;
             padding: 20px;
-            font-size: 26px; /* Phóng to chữ lên một chút vì không còn khung */
+            font-size: 26px; 
             font-weight: 900;
-            color: #fff; /* Chữ màu trắng */
-            background-color: transparent; /* Nền hoàn toàn trong suốt */
-            border: none; /* Không viền */
+            color: #fff; 
+            background-color: transparent; 
+            border: none; 
             cursor: pointer;
             display: none;
             text-transform: uppercase;
             width: 100%;
             text-align: center;
             letter-spacing: 4px;
-            /* Tạo hiệu ứng bóng đổ và phát sáng xung quanh chữ */
             text-shadow: 0 5px 15px rgba(0,0,0,0.9), 0 0 20px rgba(255, 255, 255, 0.6);
             transition: color 0.3s, text-shadow 0.3s, transform 0.2s;
-            -webkit-tap-highlight-color: transparent; /* Tắt nháy xanh khi bấm trên điện thoại */
+            -webkit-tap-highlight-color: transparent; 
         }
 
         button.reset-btn.show {
             animation: popUpOverlay 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
         }
 
-        /* Khi người dùng di chuột vào hoặc chạm tay trên màn hình */
         button.reset-btn:hover { 
-            color: #f1c40f; /* Chữ chuyển sang màu vàng gold */
+            color: #f1c40f; 
             text-shadow: 0 5px 15px rgba(0,0,0,0.9), 0 0 30px rgba(241, 196, 15, 0.9);
         }
         
@@ -208,7 +227,7 @@ button.reset-btn {
             .board > div { gap: 6px !important; }
             .result-board { font-size: 20px; letter-spacing: 3px; }
             .history-sidebar { width: 260px; right: -260px; }
-            button.reset-btn { font-size: 16px; padding: 15px 25px; }
+            button.reset-btn { font-size: 22px; padding: 15px; }
         }
     </style>
 </head>
@@ -229,7 +248,12 @@ button.reset-btn {
     </div>
 
     <div class="app-container">
-        <h2>Bốc Số Trực Quan</h2>
+        
+        <!-- THANH CHỮ CHẠY LED THAY CHO TIÊU ĐỀ H2 -->
+<!-- Dùng một container rỗng -->
+<div class="ticker-wrap">
+    <div class="ticker-text" id="ticker-text">--- BẮT ĐẦU QUAY SỐ ---</div>
+</div>
         
         <div class="tabs-container">
             <div class="tabs" id="tabs-bar">
@@ -245,10 +269,8 @@ button.reset-btn {
         <div class="result-board" id="result-display"></div>
         <div class="instruction" id="instruction"></div>
         
-        <!-- WRAPPER CHỨA BÀI VÀ NÚT OVERLAY -->
         <div class="board-container">
             <div class="board" id="board"></div>
-            <!-- Nút Reset lơ lửng -->
             <button id="reset-btn" class="reset-btn" onclick="initGame()">Chơi tiếp ván mới</button>
         </div>
         
@@ -258,6 +280,9 @@ button.reset-btn {
         const historySidebar = document.getElementById('history-sidebar');
         const overlay = document.getElementById('overlay');
         const historyToggleBtn = document.getElementById('history-toggle');
+        const tickerTextElement = document.getElementById('ticker-text');
+
+        let tickerHistoryStr = ""; // Chuỗi lưu lịch sử chữ chạy
 
         function toggleHistory() {
             historySidebar.classList.toggle('open');
@@ -420,7 +445,6 @@ button.reset-btn {
         }
 
         function initGame() {
-            // Đặt lại hiệu ứng về trạng thái ban đầu
             board.classList.remove('dimmed');
             resetBtn.classList.remove('show');
             resetBtn.style.display = 'none';
@@ -447,6 +471,18 @@ button.reset-btn {
             if (currentType === 'lotto-sub') { createDeck(currentMaxSubPool, true); }
         }
 
+function updateTicker(region, numberStr) {
+    let plainNumber = numberStr.replace(/<[^>]*>?/gm, '');
+    let newRecord = ` [${region}] ${plainNumber} `;
+
+    // Tạo span mới
+    let span = document.createElement("span");
+    span.innerHTML = " &nbsp;&nbsp;⭐&nbsp;&nbsp; " + newRecord;
+    
+    // Thêm vào cuối ticker-text
+    tickerTextElement.appendChild(span);
+}
+
         function endGame() {
             instruction.textContent = 'Tuyệt vời! Kết quả của bạn:';
             instruction.style.color = '#f1c40f';
@@ -467,10 +503,9 @@ button.reset-btn {
                 }
             });
 
-            // Ép nút hiển thị và bật hiệu ứng nảy (pop-up)
             setTimeout(() => {
                 board.classList.add('dimmed');
-                resetBtn.style.display = 'block'; // Bắt buộc phải có lệnh này
+                resetBtn.style.display = 'block'; 
                 resetBtn.classList.add('show');
             }, 800); 
 
@@ -501,9 +536,33 @@ button.reset-btn {
             `;
             
             historyList.prepend(newHistoryItem);
+
+            // Ghi kết quả mới vào thanh LED
+            updateTicker(currentRegion, finalNumberString);
         }
 
         initGame();
+		let pendingRecords = []; // Danh sách chờ để update
+
+function updateTicker(region, numberStr) {
+    let plainNumber = numberStr.replace(/<[^>]*>?/gm, '');
+    let newRecord = ` &nbsp;&nbsp;⭐&nbsp;&nbsp; [${region}] ${plainNumber} `;
+    
+    // Chỉ lưu vào bộ đệm, KHÔNG chèn vào ticker-text ngay
+    pendingRecords.push(newRecord);
+}
+
+// Lắng nghe sự kiện kết thúc 1 vòng chạy của animation
+tickerTextElement.addEventListener('animationiteration', () => {
+    if (pendingRecords.length > 0) {
+        // Chỉ khi chạy hết vòng, mới lấy toàn bộ kết quả mới nối vào
+        pendingRecords.forEach(record => {
+            tickerTextElement.innerHTML += record;
+        });
+        pendingRecords = []; // Xóa bộ đệm sau khi đã cập nhật
+    }
+});
+		
     </script>
 </body>
 </html>

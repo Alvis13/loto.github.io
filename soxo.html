@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bốc Bài Sổ Xố & Jackpot Chuyên Nghiệp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50;
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Nút chọn chế độ */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .tab {
+            padding: 10px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #bdc3c7;
+            background-color: #34495e;
+            border: 2px solid #2c3e50;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background-color: #3d566e;
+        }
+
+        .tab.active {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
+        }
+
+        /* Bố cục chia 2 cột */
+        .app-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: flex-start;
+        }
+
+        .game-area {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .history-sidebar {
+            flex: 1;
+            background-color: #34495e;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #7f8c8d;
+            min-width: 260px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .history-sidebar h3 {
+            margin-top: 0;
+            color: #f1c40f;
+            border-bottom: 2px solid #7f8c8d;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .history-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .history-list li {
+            background-color: #2c3e50;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ecf0f1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .region-tag {
+            font-size: 12px;
+            color: #f39c12;
+            text-transform: uppercase;
+        }
+
+        .number-tag {
+            letter-spacing: 3px;
+            color: #2ecc71;
+        }
+
+        /* Bảng hiển thị con số cuối cùng */
+        .result-board {
+            background-color: #fff;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 32px;
+            font-weight: bold;
+            color: #e74c3c;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+            border: 3px solid #f1c40f;
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .instruction {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+            text-align: center;
+        }
+
+        .board {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        /* Định dạng lá bài */
+        .card {
+            width: 45px;
+            height: 65px;
+            background-color: transparent;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card.disabled {
+            cursor: not-allowed;
+            opacity: 0.35;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        .card-front {
+            background-color: #34495e;
+            color: #95a5a6;
+            border: 1px solid #1a252f;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.05) 5px, rgba(255,255,255,0.05) 10px);
+        }
+        .card-back {
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            transform: rotateY(180deg);
+            border: 2px solid #bdc3c7;
+        }
+        .card.user-picked .card-back {
+            background-color: #fffacd;
+            color: #c0392b;
+            border: 2px solid #f1c40f;
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+        }
+
+        /* Giao diện lá bài SỐ PHỤ */
+        .card-front.sub-front {
+            background-color: #c0392b;
+            border-color: #922b21;
+        }
+        .card-front.sub-front {
+            color: #e6b0aa;
+        }
+        .card.user-picked.sub-card .card-back {
+            background-color: #fef9e7;
+            color: #d35400; 
+            border: 2px solid #e67e22;
+            box-shadow: 0 0 10px rgba(230, 126, 34, 0.6);
+        }
+
+        button.reset-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #27ae60;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: none;
+            text-transform: uppercase;
+        }
+
+        button.reset-btn:hover {
+            background-color: #2ecc71;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .history-sidebar {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Khu vực chơi bên trái -->
+        <div class="game-area">
+            <h2>Hệ Thống Bốc Số Trực Quan</h2>
+            
+            <div class="tabs">
+                <button id="tab-mb" class="tab active" onclick="switchMode('digit', 5, 9, 'Miền Bắc')">Miền Bắc</button>
+                <button id="tab-mn" class="tab" onclick="switchMode('digit', 6, 9, 'Miền Nam')">Miền Nam</button>
+                <!-- Thêm Tab 3D+/3D Pro -->
+                <button id="tab-max3d" class="tab" onclick="switchMode('max3d', 6, 9, '3D+ / 3D Pro')">3D+ / 3D Pro</button>
+                <button id="tab-mega" class="tab" onclick="switchMode('lotto', 6, 45, 'Mega 6/45')">Mega 6/45</button>
+                <button id="tab-power" class="tab" onclick="switchMode('lotto', 6, 55, 'Power 6/55')">Power 6/55</button>
+                <button id="tab-loto35" class="tab" onclick="switchMode('lotto-sub', 5, 35, 'Loto 5/35', 1, 12)">Loto 5/35 + Phụ</button>
+            </div>
+
+            <div class="result-board" id="result-display"></div>
+            <div class="instruction" id="instruction"></div>
+            
+            <div class="board" id="board"></div>
+            <button id="reset-btn" class="reset-btn" onclick="initGame()">Chơi tiếp ván mới</button>
+        </div>
+
+        <!-- Khu vực lịch sử bên phải -->
+        <div class="history-sidebar">
+            <h3>Lịch sử quay</h3>
+            <ul class="history-list" id="history-list">
+                <!-- Lịch sử chèn vào đây -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const resultDisplay = document.getElementById('result-display');
+        const instruction = document.getElementById('instruction');
+        const resetBtn = document.getElementById('reset-btn');
+        const historyList = document.getElementById('history-list');
+        
+        let pickedNumbers = [];
+        let pickedSubNumbers = [];
+        let cardElements = [];
+        let subCardElements = [];
+        
+        let currentType = 'digit'; 
+        let currentPicks = 5; 
+        let currentMaxPool = 9; 
+        let currentRegion = 'Miền Bắc';
+        let currentSubPicks = 0;
+        let currentMaxSubPool = 0;
+
+        function switchMode(type, picks, maxPool, regionName, subPicks = 0, maxSubPool = 0) {
+            currentType = type;
+            currentPicks = picks;
+            currentMaxPool = maxPool;
+            currentRegion = regionName;
+            currentSubPicks = subPicks;
+            currentMaxSubPool = maxSubPool;
+
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            if (regionName === 'Miền Bắc') document.getElementById('tab-mb').classList.add('active');
+            if (regionName === 'Miền Nam') document.getElementById('tab-mn').classList.add('active');
+            if (regionName === '3D+ / 3D Pro') document.getElementById('tab-max3d').classList.add('active');
+            if (regionName === 'Mega 6/45') document.getElementById('tab-mega').classList.add('active');
+            if (regionName === 'Power 6/55') document.getElementById('tab-power').classList.add('active');
+            if (regionName === 'Loto 5/35') document.getElementById('tab-loto35').classList.add('active');
+            
+            initGame();
+        }
+
+        function formatNumber(num) {
+            if (currentType.includes('lotto')) {
+                return num < 10 ? '0' + num : num.toString();
+            }
+            return num.toString();
+        }
+
+        function updateDisplay() {
+            let mainArr = pickedNumbers.map(n => formatNumber(n));
+            
+            // Xử lý riêng giao diện cho Max 3D (chia 2 bộ 3 số)
+            if (currentType === 'max3d') {
+                while(mainArr.length < currentPicks) mainArr.push('_');
+                let part1 = mainArr.slice(0, 3).join(' ');
+                let part2 = mainArr.slice(3, 6).join(' ');
+                resultDisplay.innerHTML = `${part1} &nbsp;&nbsp;<span style="color:#f1c40f">-</span>&nbsp;&nbsp; ${part2}`;
+            } 
+            else if (currentType === 'lotto-sub') {
+                while(mainArr.length < currentPicks) mainArr.push('__');
+                let mainStr = mainArr.join(' ');
+                
+                let subArr = pickedSubNumbers.map(n => formatNumber(n));
+                while(subArr.length < currentSubPicks) subArr.push('__');
+                let subStr = subArr.join(' ');
+                
+                resultDisplay.textContent = mainStr + ' | ' + subStr;
+            } 
+            else {
+                let pad = currentType === 'digit' ? '_' : '__';
+                while(mainArr.length < currentPicks) mainArr.push(pad);
+                resultDisplay.textContent = mainArr.join(' ');
+            }
+        }
+
+        function createDeck(maxNum, isSub = false) {
+            let pool = [];
+            
+            // Nếu là thể loại rút từng chữ số (Kiến thiết hoặc Max 3D)
+            if ((currentType === 'digit' || currentType === 'max3d') && !isSub) {
+                for (let i = 0; i < currentPicks; i++) {
+                    for (let j = 0; j <= 9; j++) { pool.push(j); }
+                }
+            } else { // Rút số lotto
+                for (let i = 1; i <= maxNum; i++) { pool.push(i); }
+            }
+
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+
+            const poolContainer = document.createElement('div');
+            poolContainer.style.display = 'flex';
+            poolContainer.style.flexWrap = 'wrap';
+            poolContainer.style.justifyContent = 'center';
+            poolContainer.style.gap = '8px';
+            poolContainer.style.width = '100%';
+
+            if (isSub) {
+                const title = document.createElement('div');
+                title.style.width = '100%';
+                title.style.textAlign = 'center';
+                title.style.color = '#f1c40f';
+                title.style.margin = '15px 0 5px 0';
+                title.style.fontWeight = 'bold';
+                title.textContent = '🔮 KHU VỰC SỐ PHỤ 🔮';
+                board.appendChild(title);
+            }
+
+            pool.forEach((number) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                if (isSub) card.classList.add('sub-card'); 
+                
+                let displayValue = formatNumber(number);
+
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front ${isSub ? 'sub-front' : ''}">?</div>
+                        <div class="card-back">${displayValue}</div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => {
+                    let targetArray = isSub ? pickedSubNumbers : pickedNumbers;
+                    let targetMax = isSub ? currentSubPicks : currentPicks;
+
+                    if (targetArray.length < targetMax && !card.classList.contains('flipped')) {
+                        card.classList.add('flipped');
+                        card.classList.add('user-picked');
+                        targetArray.push(number);
+                        
+                        updateDisplay();
+
+                        let mainDone = pickedNumbers.length === currentPicks;
+                        let subDone = currentType === 'lotto-sub' ? pickedSubNumbers.length === currentSubPicks : true;
+
+                        if (mainDone && subDone) {
+                            endGame();
+                        }
+                    }
+                });
+
+                if (isSub) {
+                    subCardElements.push(card);
+                } else {
+                    cardElements.push(card);
+                }
+                
+                poolContainer.appendChild(card);
+            });
+
+            board.appendChild(poolContainer);
+        }
+
+        function initGame() {
+            board.innerHTML = '';
+            pickedNumbers = [];
+            pickedSubNumbers = [];
+            cardElements = [];
+            subCardElements = [];
+            
+            updateDisplay();
+            
+            if (currentType === 'lotto-sub') {
+                instruction.textContent = `Hãy bốc ${currentPicks} số chính (Xanh) và ${currentSubPicks} số phụ (Đỏ)!`;
+            } else if (currentType === 'max3d') {
+                instruction.textContent = `Hãy bốc 6 lá bài (gồm 2 bộ 3 số)!`;
+            } else {
+                instruction.textContent = `Hãy bốc ${currentPicks} lá bài bất kỳ!`;
+            }
+            
+            instruction.style.color = '#bdc3c7';
+            resetBtn.style.display = 'none';
+
+            createDeck(currentMaxPool, false);
+
+            if (currentType === 'lotto-sub') {
+                createDeck(currentMaxSubPool, true);
+            }
+        }
+
+        function endGame() {
+            instruction.textContent = 'Tuyệt vời! Dưới đây là kết quả toàn bộ.';
+            instruction.style.color = '#f1c40f';
+            resetBtn.style.display = 'block';
+
+            let allCards = [...cardElements, ...subCardElements];
+            
+            allCards.forEach((card, index) => {
+                if (!card.classList.contains('user-picked')) {
+                    setTimeout(() => {
+                        card.classList.add('flipped');
+                        card.classList.add('disabled');
+                    }, index * (currentType.includes('lotto') ? 8 : 12)); 
+                }
+            });
+
+            // LOGIC GHI LỊCH SỬ CHO TỪNG LOẠI
+            let finalNumberString = "";
+            
+            if (currentType === 'digit') {
+                finalNumberString = pickedNumbers.join('');
+            } 
+            else if (currentType === 'max3d') {
+                // Định dạng Max 3D: XXX - YYY
+                let part1 = pickedNumbers.slice(0, 3).join('');
+                let part2 = pickedNumbers.slice(3, 6).join('');
+                finalNumberString = `${part1} - ${part2}`;
+            } 
+            else {
+                let sortedPicks = [...pickedNumbers].sort((a, b) => a - b);
+                finalNumberString = sortedPicks.map(n => formatNumber(n)).join(' - ');
+                
+                if (currentType === 'lotto-sub') {
+                    let sortedSub = [...pickedSubNumbers].sort((a, b) => a - b);
+                    finalNumberString += ` <span style="color: #f1c40f;">| ${sortedSub.map(n => formatNumber(n)).join(' - ')}</span>`;
+                }
+            }
+
+            const newHistoryItem = document.createElement('li');
+            newHistoryItem.innerHTML = `
+                <span class="region-tag">[${currentRegion}]</span>
+                <span class="number-tag" style="letter-spacing: ${currentType.includes('lotto') ? '2px' : '5px'};">${finalNumberString}</span>
+            `;
+            
+            historyList.prepend(newHistoryItem);
+        }
+
+        initGame();
+    </script>
+</body>
+</html>

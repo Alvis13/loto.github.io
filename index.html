@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bốc Bài Sổ Xố & Jackpot (Mobile Optimized)</title>
+    <title>Bốc Bài Sổ Xố - App Giao Diện Di Động</title>
     <style>
-        /* CSS CHUNG CHO MỌI THIẾT BỊ */
+        /* CSS CHUNG */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #1e272e;
             margin: 0;
-            padding: 20px;
+            padding: 20px 10px;
             color: white;
-            /* Ngăn chặn thao tác bôi đen chữ khi lỡ tay chạm đúp trên điện thoại */
             user-select: none; 
             -webkit-user-select: none;
+            overflow-x: hidden; /* Ngăn cuộn ngang toàn trang */
         }
 
         h2 {
@@ -24,17 +24,34 @@
             font-size: 24px;
         }
 
-        /* Nút chọn chế độ */
+        /* ---------------------------------------------------
+           1. THANH CHỌN TAB - CUỘN NGANG MƯỢT MÀ
+           --------------------------------------------------- */
+        .tabs-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            position: relative;
+        }
+
         .tabs {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding: 5px 0 10px 0;
+            scroll-behavior: smooth;
+            /* Ẩn thanh cuộn nhưng vẫn cho phép vuốt */
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
         }
+
+        .tabs::-webkit-scrollbar { display: none; }
 
         .tab {
             padding: 10px 18px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             color: #bdc3c7;
             background-color: #2c3e50;
@@ -42,7 +59,8 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
-            white-space: nowrap; /* Không cho chữ rớt dòng */
+            white-space: nowrap; /* Bắt buộc chữ nằm trên 1 dòng */
+            flex-shrink: 0; /* Không cho thẻ tab bị bóp méo khi màn hình nhỏ */
         }
 
         .tab.active {
@@ -52,80 +70,32 @@
             box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
         }
 
-        /* Bố cục chia 2 cột cho PC */
+        /* ---------------------------------------------------
+           2. KHU VỰC CHƠI CHÍNH
+           --------------------------------------------------- */
         .app-container {
-            display: flex;
-            gap: 30px;
-            max-width: 1100px;
-            margin: 0 auto;
-            align-items: flex-start;
-        }
-
-        .game-area {
-            flex: 3;
             display: flex;
             flex-direction: column;
             align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
             width: 100%;
         }
 
-        .history-sidebar {
-            flex: 1;
-            background-color: #2c3e50;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #34495e;
-            min-width: 260px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .history-sidebar h3 {
-            margin-top: 0;
-            color: #f1c40f;
-            border-bottom: 2px solid #34495e;
-            padding-bottom: 10px;
-            text-align: center;
-        }
-
-        .history-list {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .history-list li {
-            background-color: #1e272e;
-            margin-bottom: 10px;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #ecf0f1;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .region-tag { font-size: 12px; color: #f39c12; text-transform: uppercase; }
-        .number-tag { letter-spacing: 3px; color: #2ecc71; }
-
-        /* Bảng hiển thị con số cuối cùng */
         .result-board {
             background-color: #fff;
-            padding: 15px 25px;
+            padding: 15px 10px;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-size: 32px;
+            font-size: 26px;
             font-weight: bold;
             color: #e74c3c;
-            letter-spacing: 8px;
+            letter-spacing: 5px;
             margin-bottom: 15px;
             border: 3px solid #f1c40f;
-            min-width: 250px;
-            text-align: center;
             width: 100%;
+            max-width: 500px;
+            text-align: center;
             box-sizing: border-box;
         }
 
@@ -145,69 +115,6 @@
             width: 100%;
         }
 
-        /* Định dạng lá bài cho PC */
-        .card {
-            width: 48px;
-            height: 70px;
-            background-color: transparent;
-            perspective: 1000px;
-            cursor: pointer;
-        }
-
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
-            transform-style: preserve-3d;
-        }
-
-        .card.flipped .card-inner { transform: rotateY(180deg); }
-        .card.disabled { cursor: not-allowed; opacity: 0.35; }
-
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: bold;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-        }
-
-        .card-front {
-            background-color: #34495e;
-            color: #95a5a6;
-            border: 1px solid #2c3e50;
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.05) 5px, rgba(255,255,255,0.05) 10px);
-        }
-        
-        .card-back {
-            background-color: #ecf0f1;
-            color: #7f8c8d;
-            transform: rotateY(180deg);
-            border: 2px solid #bdc3c7;
-        }
-
-        .card.user-picked .card-back {
-            background-color: #fffacd;
-            color: #c0392b;
-            border: 2px solid #f1c40f;
-            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
-        }
-
-        .card-front.sub-front { background-color: #c0392b; border-color: #922b21; color: #e6b0aa; }
-        .card.user-picked.sub-card .card-back {
-            background-color: #fef9e7;
-            color: #d35400; 
-            border: 2px solid #e67e22;
-        }
-
         button.reset-btn {
             padding: 15px 30px;
             font-size: 16px;
@@ -220,80 +127,221 @@
             transition: background-color 0.3s;
             display: none;
             text-transform: uppercase;
-            width: 100%; /* Nút full màn hình trên điện thoại cho dễ bấm */
+            width: 100%;
             max-width: 300px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        button.reset-btn:hover { background-color: #2ecc71; }
+
+        /* ĐỊNH DẠNG LÁ BÀI */
+        .card {
+            width: 45px;
+            height: 65px;
+            background-color: transparent;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+        .card.disabled { cursor: not-allowed; opacity: 0.35; }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+        }
+        .card-front {
+            background-color: #34495e;
+            color: #95a5a6;
+            border: 1px solid #2c3e50;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.05) 5px, rgba(255,255,255,0.05) 10px);
+        }
+        .card-back {
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            transform: rotateY(180deg);
+            border: 2px solid #bdc3c7;
+        }
+        .card.user-picked .card-back {
+            background-color: #fffacd;
+            color: #c0392b;
+            border: 2px solid #f1c40f;
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+        }
+        .card-front.sub-front { background-color: #c0392b; border-color: #922b21; color: #e6b0aa; }
+        .card.user-picked.sub-card .card-back {
+            background-color: #fef9e7;
+            color: #d35400; 
+            border: 2px solid #e67e22;
         }
 
         /* ---------------------------------------------------
-           MOBILE OPTIMIZATION (GIAO DIỆN DÀNH RIÊNG ĐIỆN THOẠI)
+           3. NGĂN KÉO LỊCH SỬ (SLIDE-OUT DRAWER)
            --------------------------------------------------- */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px; /* Giảm lề thừa */
-            }
+        
+        /* Lớp phủ đen nền khi mở lịch sử */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-            .app-container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 20px;
-            }
+        /* Nút mũi tên nổi bên phải */
+        .history-toggle {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px 8px 15px 12px;
+            border-radius: 15px 0 0 15px;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 997;
+            font-size: 18px;
+            transition: right 0.3s ease;
+        }
+        .history-toggle:hover {
+            background-color: #c0392b;
+        }
 
-            /* Thanh Tab có thể vuốt ngang trên điện thoại */
-            .tabs {
-                justify-content: flex-start;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                padding-bottom: 8px;
-                /* Ẩn thanh cuộn xấu xí nhưng vẫn vuốt được */
-                -ms-overflow-style: none;  
-                scrollbar-width: none;  
-            }
-            .tabs::-webkit-scrollbar { 
-                display: none; 
-            }
+        /* Bảng lịch sử trượt ra */
+        .history-sidebar {
+            position: fixed;
+            top: 0;
+            right: -320px; /* Giấu toàn bộ sang bên phải */
+            width: 280px;
+            height: 100vh; /* Cao bằng màn hình */
+            background-color: #2c3e50;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+            z-index: 999;
+            transition: right 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        /* Class kích hoạt trượt ra */
+        .history-sidebar.open {
+            right: 0;
+        }
 
-            .tab {
-                padding: 8px 14px;
-                font-size: 14px;
-            }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #34495e;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
 
-            /* Bảng kết quả nhỏ lại cho vừa màn hình */
-            .result-board {
-                font-size: 22px; /* Chữ nhỏ lại */
-                letter-spacing: 4px; /* Giảm khoảng cách chữ */
-                padding: 12px 10px;
-                min-width: 100%;
-            }
+        .history-sidebar h3 {
+            margin: 0;
+            color: #f1c40f;
+        }
 
-            /* Kích thước lá bài thu nhỏ lại để hiển thị đủ 6 lá trên 1 hàng ngang */
-            .card {
-                width: 42px; /* Thu hẹp chiều ngang */
-                height: 60px; /* Thu hẹp chiều dọc */
-            }
+        /* Nút đóng bảng lịch sử (Dấu X) */
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #bdc3c7;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
 
-            .card-front, .card-back {
-                font-size: 18px; /* Giảm font chữ của số trong bài */
-            }
+        .history-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto; /* Cho phép cuộn bên trong lịch sử */
+            flex-grow: 1;
+            /* Ẩn thanh cuộn */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .history-list::-webkit-scrollbar { display: none; }
 
-            /* Khoảng cách các lá bài sát lại */
-            .board > div {
-                gap: 5px !important;
-            }
+        .history-list li {
+            background-color: #1e272e;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-            .history-sidebar {
-                max-height: 400px; /* Giới hạn chiều cao lịch sử để vuốt dễ hơn */
-                padding: 15px;
-            }
+        .region-tag { font-size: 12px; color: #f39c12; text-transform: uppercase; }
+        .number-tag { letter-spacing: 2px; color: #2ecc71; }
+
+        /* Tối ưu Mobile sâu hơn */
+        @media (max-width: 480px) {
+            .card { width: 40px; height: 58px; }
+            .card-front, .card-back { font-size: 18px; }
+            .board > div { gap: 6px !important; }
+            .result-board { font-size: 20px; letter-spacing: 3px; }
+            .history-sidebar { width: 260px; right: -260px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Lớp phủ tối màu khi mở Menu -->
+    <div class="overlay" id="overlay" onclick="toggleHistory()"></div>
+
+    <!-- Nút trượt lịch sử ở rìa phải -->
+    <div class="history-toggle" id="history-toggle" onclick="toggleHistory()">
+        &#10094; <!-- Mũi tên hướng trái ❮ -->
+    </div>
+
+    <!-- Ngăn kéo lịch sử -->
+    <div class="history-sidebar" id="history-sidebar">
+        <div class="history-header">
+            <h3>Lịch sử quay</h3>
+            <button class="close-btn" onclick="toggleHistory()">&#10006;</button> <!-- Dấu ✖ -->
+        </div>
+        <ul class="history-list" id="history-list">
+            <!-- Lịch sử chèn vào đây -->
+        </ul>
+    </div>
+
     <div class="app-container">
-        <div class="game-area">
-            <h2>Hệ Thống Bốc Số Trực Quan</h2>
-            
-            <div class="tabs">
+        <h2>Bốc Số Trực Quan</h2>
+        
+        <div class="tabs-container">
+            <div class="tabs" id="tabs-bar">
                 <button id="tab-mb" class="tab active" onclick="switchMode('digit', 5, 9, 'Miền Bắc')">Miền Bắc</button>
                 <button id="tab-mn" class="tab" onclick="switchMode('digit', 6, 9, 'Miền Nam')">Miền Nam</button>
                 <button id="tab-max3d" class="tab" onclick="switchMode('max3d', 6, 9, '3D+ / 3D Pro')">3D+ / 3D Pro</button>
@@ -301,22 +349,35 @@
                 <button id="tab-power" class="tab" onclick="switchMode('lotto', 6, 55, 'Power 6/55')">Power 6/55</button>
                 <button id="tab-loto35" class="tab" onclick="switchMode('lotto-sub', 5, 35, 'Loto 5/35', 1, 12)">Loto 5/35 + Phụ</button>
             </div>
-
-            <div class="result-board" id="result-display"></div>
-            <div class="instruction" id="instruction"></div>
-            
-            <div class="board" id="board"></div>
-            <button id="reset-btn" class="reset-btn" onclick="initGame()">Chơi tiếp ván mới</button>
         </div>
 
-        <div class="history-sidebar">
-            <h3>Lịch sử quay</h3>
-            <ul class="history-list" id="history-list">
-            </ul>
-        </div>
+        <div class="result-board" id="result-display"></div>
+        <div class="instruction" id="instruction"></div>
+        
+        <div class="board" id="board"></div>
+        <button id="reset-btn" class="reset-btn" onclick="initGame()">Chơi tiếp ván mới</button>
     </div>
 
     <script>
+        // --- LOGIC GIAO DIỆN MỚI ---
+        const historySidebar = document.getElementById('history-sidebar');
+        const overlay = document.getElementById('overlay');
+        const historyToggleBtn = document.getElementById('history-toggle');
+
+        function toggleHistory() {
+            historySidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            
+            // Giấu nút mũi tên đi khi bảng đã mở ra để đỡ vướng
+            if (historySidebar.classList.contains('open')) {
+                historyToggleBtn.style.right = '-50px'; 
+            } else {
+                historyToggleBtn.style.right = '0';
+            }
+        }
+
+
+        // --- LOGIC GAME CŨ ---
         const board = document.getElementById('board');
         const resultDisplay = document.getElementById('result-display');
         const instruction = document.getElementById('instruction');
@@ -351,13 +412,18 @@
             if (regionName === 'Power 6/55') document.getElementById('tab-power').classList.add('active');
             if (regionName === 'Loto 5/35') document.getElementById('tab-loto35').classList.add('active');
             
+            // Tự động căn giữa thanh tab đang chọn
+            const activeTab = document.querySelector('.tab.active');
+            const tabsBar = document.getElementById('tabs-bar');
+            if(activeTab) {
+                tabsBar.scrollLeft = activeTab.offsetLeft - (tabsBar.offsetWidth / 2) + (activeTab.offsetWidth / 2);
+            }
+
             initGame();
         }
 
         function formatNumber(num) {
-            if (currentType.includes('lotto')) {
-                return num < 10 ? '0' + num : num.toString();
-            }
+            if (currentType.includes('lotto')) { return num < 10 ? '0' + num : num.toString(); }
             return num.toString();
         }
 

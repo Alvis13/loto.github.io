@@ -237,6 +237,45 @@
     </style>
 </head>
 <body>
+	<script>
+
+    (function() {
+
+        // Kiểm tra xem đã có mật khẩu được lưu chưa
+
+        const savedPass = localStorage.getItem("game_password");
+
+        const correctPass = "6167"; // Thay mật khẩu của bạn ở đây
+
+
+
+        if (savedPass !== correctPass) {
+
+            const input = prompt("Nhập mật khẩu để truy cập:");
+
+            
+
+            if (input !== correctPass) {
+
+                document.body.innerHTML = "<h2 style='text-align:center;'>Truy cập bị từ chối!</h2>";
+
+                window.stop();
+
+                throw new Error("Access Denied");
+
+            } else {
+
+                // Nếu đúng, lưu vào bộ nhớ để lần sau không cần nhập nữa
+
+                localStorage.setItem("game_password", input);
+
+            }
+
+        }
+
+    })();
+
+</script>
 
     <div class="overlay" id="overlay" onclick="toggleHistory()"></div>
 

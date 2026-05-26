@@ -314,6 +314,28 @@
             .result-board { font-size: 20px; letter-spacing: 3px; }
             .history-sidebar { width: 260px; right: -260px; }
         }
+		
+		/* --- BẠN DÁN ĐOẠN CODE ẨN THANH CUỘN VÀO ĐÂY --- */
+        ::-webkit-scrollbar {
+            display: none; 
+        }
+        html, body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* ----------------------------------------------- */
+
+        /* CSS CHUNG (Các code cũ của bạn nằm ở dưới này) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e272e;
+            margin: 0;
+            padding: 20px 10px;
+            color: white;
+            user-select: none; 
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
     </style>
 </head>
 <body>
